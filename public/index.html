@@ -5,9 +5,55 @@
         <meta http-equiv="X-UA-Compatible" content="IE=edge" />
         <meta name="viewport" content= "width=device-width, initial-scale=1.0"> 
         <title>XYZ</title>
+        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css" integrity="sha384-9aIt2nRpC12Uk9gS9baDl411NQApFmC26EwAOH8WgZl5MYYxFfc+NcPb1dKGj7Sk" crossorigin="anonymous">
     </head>
     <body>
+      <div class="container">
         <h1>XYZ Coordinates</h1>
+        <form id="form">
+          <div class="row">
+            <div class="form-group col-sm-2">
+                <label for="uLat">User Latitude</label>
+                <input id="uLat" name="uLat" type="number" step="0.000000000000001" class="form-control" required>
+            </div>
+            <div class="form-group col-sm-2">
+                <label for="uLon">User Longitude</label>
+                <input id="uLon" name="uLon" type="number" step="0.000000000000001" class="form-control" required>
+            </div>
+            <div class="form-group col-sm-2">
+              <label for="uAlt">User Altitude</label>
+              <input id="uAlt" name="uAlt" type="number" step="0.01" class="form-control">
+            </div>
+          </div>
+          <div class="row">
+            <div class="form-group col-sm-2">
+                <label for="u-bearing">User Bearing</label>
+                <input id="uBearing" name="uBearing" type="number" class="form-control" placeholder="North = 0" required>
+            </div>
+          </div>
+          <div class="row">
+            <div class="form-group col-sm-2">
+                <label for="oLat">Object Latitude</label>
+                <input id="oLat" name="oLat" type="number" step="0.000000000000001" class="form-control" required>
+            </div>
+            <div class="form-group col-sm-2">
+                <label for="oLon">Object Longitude</label>
+                <input id="oLon" name="oLon" type="number" step="0.000000000000001" class="form-control" required>
+            </div>
+            <div class="form-group col-sm-2">
+              <label for="oAlt">Object Altitude</label>
+              <input id="oAlt" name="oAlt" type="number" step="0.01" class="form-control">
+            </div>
+          </div>
+          <input type="submit" value="GO" class="btn btn-outline-primary">
+        </form>
+        <div id="display">
+            <div>X: <span id="x"></span></div>
+            <div>Y: <span id="y"></span></div>
+            <div>Z: <span id="z"></span></div>
+        </div>
+        <script src="main.js"></script>
         <script src="geometry.js"></script>
+      </div>
     </body>
 </html>
