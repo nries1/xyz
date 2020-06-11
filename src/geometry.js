@@ -15,24 +15,23 @@
   
     MYGEOMETRY.getBearing = function(userLat, userLon, objectLat, objectLon) {
       // this is the angle that a user would need to start walking at in order to get from their location to the object's location
+      // formula from https://www.igismap.com/formula-to-find-bearing-or-heading-angle-between-two-points-latitude-longitude/
       objectLat = MYGEOMETRY.toRadians(objectLat);
       objectLon = MYGEOMETRY.toRadians(objectLon);
       userLat = MYGEOMETRY.toRadians(userLat);
       userLon = MYGEOMETRY.toRadians(userLon);
-      const Y = Math.sin(objectLon - userLon) * Math.cos(objectLat);
-      const X =
-        Math.cos(userLat) * Math.sin(objectLat) -
-        Math.sin(userLat) *
-          Math.cos(objectLat) *
-          Math.cos(objectLon - userLon);
-      const bearing = Math.atan2(Y, X);
+      const longitudeDelta = objectLon - userLon
+      // tweaking bearing formula
+      const X = Math.cos(objectLat) * Math.sin(longitudeDelta);
+      const Y = Math.cos(userLat) * Math.sin(objectLat) - (Math.sin(userLat) * Math.cos(objectLat) * Math.cos(longitudeDelta));
+      const bearing = Math.atan2(X, Y);
       return MYGEOMETRY.toDegrees(bearing);
     };
   
     MYGEOMETRY.getUserBearing = function(bearing, compassHeading) {
       // adjust true north based on the user's look direction to make wherever the user is looking appear to be "forward"
       // e.g. the bearing between a user and an object may be 45deg.
-      // meaning the user would walk start walking along a 45 degree
+      // meaning the user would start walking along a 45 degree
       // angle (given the curvature of the earth) to reach the object.
       // But, that 45 degrees is relative to a bearing of 0 deg (due north)
       // if the user is facing west (270 deg) and the bearing is 45 deg,
@@ -43,7 +42,7 @@
       // calculated the original bearing. Specifically, they're turned 360 - 270 = 90 deg westward. So we add that 90 deg
       // to their bearing and the user bearing ends up being 90 + 45 = 135 deg.
       return compassHeading > bearing
-        ? 360 - compassHeading + bearing
+        ? (360 - compassHeading) + bearing
         : bearing - compassHeading;
     };
   
@@ -56,11 +55,7 @@
       const dLat = MYGEOMETRY.toRadians(objectLat - userLat);
       const dLon = MYGEOMETRY.toRadians(objectLon - userLon);
       const a =
-        Math.sin(dLat / 2) * Math.sin(dLat / 2) +
-        Math.cos(rLat1) *
-          Math.cos(rLat2) *
-          Math.sin(dLon / 2) *
-          Math.sin(dLon / 2);
+        ((Math.sin(dLat / 2)**2) + Math.cos(rLat1)) * Math.cos(rLat2) * Math.sin(dLon / 2)**2
       const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
       const distance = R * c;
       return distance;
@@ -74,10 +69,11 @@
       const theta = getTheta(bearing);
       const quadrant = getQuadrant(bearing);
       const sinTheta = Math.abs(Math.sin(theta));
-      const CosTheta = Math.abs(Math.cos(theta));
-      const oppositeLeg = CosTheta * distance;
+      const cosTheta = Math.abs(Math.cos(theta));
+      const oppositeLeg = cosTheta * distance;
       const adjacentLeg = sinTheta * distance;
-      if (quadrant === 1)
+      console.log('quadrant = ', quadrant);
+      if (quadrant === 1) 
         return {
           x: oppositeLeg,
           z: 0 - adjacentLeg
@@ -96,16 +92,16 @@
     };
   
     MYGEOMETRY.getTheta = function(bearing) {
-      //get the angle btw 0 and 90 for a given bearing angle (0 to 360);
+      // get the angle btw 0 and 90 for a given bearing angle (0 to 360);
       // e.g. if the user's bearing is 275deg (5 deg more than due west), their theta is 5 deg
-      const theta = bearing - Math.floor(bearing / 90) * 90;
+      const theta = bearing <= 90 ? 90 - bearing : bearing - Math.floor(bearing / 90) * 90;
       return theta;
     };
   
     MYGEOMETRY.getQuadrant = function(theta) {
-      if (theta < 90) return 1;
-      if (theta < 180) return 2;
-      if (theta < 270) return 3;
+      if (theta <= 90) return 1;
+      if (theta <= 180) return 2;
+      if (theta <= 270) return 3;
       return 4;
     };
     window.MYGEOMETRY = MYGEOMETRY;
